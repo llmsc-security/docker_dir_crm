@@ -1,0 +1,78 @@
+#!/bin/bash
+# Invoke script for Paper2Poster--Paper2Poster
+# Tests the HTTP service endpoint
+
+set -e
+
+REPO_NAME="Paper2Poster--Paper2Poster"
+DOCKER_IMAGE="paper2poster-paper2poster"
+HOST="localhost"
+HOST_PORT=11320
+CONTAINER_PORT=7860
+
+echo "============================================"
+echo "Testing Paper2Poster--Paper2Poster on port $HOST_PORT"
+echo "============================================"
+
+# Create log directory if not exists
+LOG_DIR="/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/invoke_scripts_50/${REPO_NAME}"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/invoke.log"
+
+# Function to log messages
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# Check if container is running
+log "Checking if container is running..."
+if docker ps --format '{{.Names}}' | grep -q "${REPO_NAME}"; then
+    log "Container ${REPO_NAME} is already running"
+else
+    log "Starting container for ${REPO_NAME}..."
+    docker run -d \
+        --name "${REPO_NAME}" \
+        -p ${HOST_PORT}:${CONTAINER_PORT} \
+        --rm \
+        "${DOCKER_IMAGE}:latest" || {
+            log "Failed to start container"
+            exit 1
+        }
+    sleep 5
+    log "Container started"
+fi
+
+# Test HTTP service
+log "Testing HTTP service on port $HOST_PORT..."
+MAX_RETRIES=10
+RETRY_COUNT=0
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if curl -s http://$HOST:$HOST_PORT/ > /dev/null 2>&1; then
+        log "HTTP service is running on port $HOST_PORT"
+        curl -s http://$HOST:$HOST_PORT/ >> "$LOG_FILE" 2>&1
+        log "Root endpoint test: OK"
+        break
+    fi
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    log "Waiting for service to start... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+    sleep 3
+done
+
+if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+    log "ERROR: Service failed to start within timeout"
+    exit 1
+fi
+
+# Test health endpoint if available
+log "Testing health endpoint..."
+if curl -s http://$HOST:$HOST_PORT/health > /dev/null 2>&1; then
+    log "Health endpoint test: OK"
+    curl -s http://$HOST:$HOST_PORT/health >> "$LOG_FILE" 2>&1
+else
+    log "Health endpoint not available (optional)"
+fi
+
+log "============================================"
+log "All tests passed for ${REPO_NAME}"
+log "============================================"
+

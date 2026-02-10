@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+import json
+
+# All 50 repos with their verification status
+repos = [
+    # Already verified (running containers)
+    {"repo": "666ghj--BettaFish", "container_name": "666ghj-bettafish-container", "base_port": 11370, "http_status": None, "http_success": False, "error": "No published port mapping to host", "note": "Container runs on port 8000 but no host port mapping"},
+    {"repo": "Fosowl--agenticSeek", "container_name": "agentic-seek-backend", "base_port": 11420, "http_status": None, "http_success": False, "error": "Container has no published HTTP ports", "note": "Container only exposes internal 8000/tcp and mapped 11420->7777"},
+    {"repo": "Sharrnah--whispering", "container_name": "Sharrnah--whispering", "base_port": 11010, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running - may need restart"},
+    {"repo": "langchain-ai--local-deep-researcher", "container_name": "langchain-ai--local-deep-researcher_container", "base_port": 11030, "http_status": None, "http_success": False, "error": "No published port mapping to host", "note": "Container runs on port 2024 but no host port mapping"},
+    {"repo": "mrwadams--stride-gpt", "container_name": "mrwadams--stride-gpt", "base_port": 11040, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running - may need restart"},
+    {"repo": "mrwadams--attackgen", "container_name": "mrwadams--attackgen_container", "base_port": 11110, "http_status": 200, "http_success": True, "note": "Streamlit app responding"},
+    {"repo": "Integuru-AI--Integuru", "container_name": "integuru-container", "base_port": 11070, "http_status": None, "http_success": False, "error": "Container in Restarting state", "note": "Container is restarting and not accepting connections"},
+    {"repo": "zyddnys--manga-image-translator", "container_name": "manga-image-translator-server", "base_port": 11080, "http_status": 200, "http_success": True, "note": "Image/Manga Translator Gradio app"},
+    {"repo": "adithya-s-k--omniparse", "container_name": "adithya-s-k--omniparse_container", "base_port": 11090, "http_status": 200, "http_success": True, "note": "Gradio app responding"},
+    {"repo": "stitionai--devika", "container_name": "devika-11100", "base_port": 11100, "http_status": 404, "http_success": True, "note": "Devika API responding (404 on root expected)"},
+    {"repo": "shibing624--pycorrector", "container_name": "shibing624--pycorrector_container", "base_port": 11000, "http_status": 200, "http_success": True, "note": "Chinese Spelling Correction API"},
+    {"repo": "ur-whitelab--chemcrow-public", "container_name": "ur-whitelab--chemcrow-public", "base_port": 11120, "http_status": 200, "http_success": True, "note": "ChemCrow"},
+    {"repo": "gptme--gptme", "container_name": "gptme--gptme", "base_port": 11130, "http_status": None, "http_success": False, "error": "Container exited with error", "note": "Container exited with code 1"},
+    {"repo": "vintasoftware--django-ai-assistant", "container_name": "vintasoftware--django-ai-assistant", "base_port": 11140, "http_status": 200, "http_success": True, "note": "Django AI Assistant"},
+    {"repo": "plasma-umass--ChatDBG", "container_name": "plasma-umass--ChatDBG", "base_port": 11150, "http_status": None, "http_success": False, "error": "Container exited with error", "note": "Container exited with code 1"},
+    {"repo": "jianchang512--pyvideotrans", "container_name": "jianchang512--pyvideotrans", "base_port": 11160, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "linyqh--NarratoAI", "container_name": "linyqh--NarratoAI", "base_port": 11170, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "bowang-lab--MedRAX", "container_name": "bowang-lab--MedRAX", "base_port": 11180, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "finaldie--auto-news", "container_name": "finaldie--auto-news", "base_port": 11190, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "IBM--zshot", "container_name": "IBM--zshot", "base_port": 11200, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "OpenDCAI--DataFlow", "container_name": "OpenDCAI--DataFlow", "base_port": 11210, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "chenfei-wu--TaskMatrix", "container_name": "chenfei-wu--TaskMatrix", "base_port": 11220, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "reworkd--AgentGPT", "container_name": "reworkd--AgentGPT", "base_port": 11230, "http_status": None, "http_success": False, "error": "Container not found - needs Dockerfile", "note": "Has docker-compose but no container running"},
+    {"repo": "microsoft--magentic-ui", "container_name": "microsoft--magentic-ui", "base_port": 11240, "http_status": None, "http_success": False, "error": "Container not found - needs Dockerfile creation", "note": "No container running"},
+    {"repo": "assafelovic--gpt-researcher", "container_name": "assafelovic--gpt-researcher", "base_port": 11250, "http_status": 200, "http_success": True, "note": "GPT Researcher backend"},
+    {"repo": "snap-stanford--Biomni", "container_name": "snap-stanford--Biomni", "base_port": 11260, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "binary-husky--gpt_academic", "container_name": "binary-husky--gpt_academic", "base_port": 11270, "http_status": 200, "http_success": True, "note": "GPT Academic"},
+    {"repo": "microsoft--TaskWeaver", "container_name": "microsoft--TaskWeaver", "base_port": 11280, "http_status": 200, "http_success": True, "note": "Chainlit app"},
+    {"repo": "microsoft--RD-Agent", "container_name": "microsoft--RD-Agent", "base_port": 11290, "http_status": 200, "http_success": True, "note": "RD Agent server"},
+    {"repo": "shroominic--codeinterpreter-api", "container_name": "codeinterpreter-api_container", "base_port": 11300, "http_status": 200, "http_success": True, "note": "CodeInterpreter API (Streamlit)"},
+    {"repo": "acon96--home-llm", "container_name": "acon96--home-llm", "base_port": 11310, "http_status": 200, "http_success": True, "note": "Home LLM API"},
+    {"repo": "Paper2Poster--Paper2Poster", "container_name": "paper2poster--paper2poster", "base_port": 11320, "http_status": None, "http_success": False, "error": "Container exited with error", "note": "Container exited with code 1"},
+    {"repo": "AntonOsika--gpt-engineer", "container_name": "AntonOsika--gpt-engineer", "base_port": 11330, "http_status": None, "http_success": False, "error": "Container not found - needs Dockerfile", "note": "Has docker-compose but no container running"},
+    {"repo": "bhaskatripathi--pdfGPT", "container_name": "bhaskatripathi--pdfGPT", "base_port": 11340, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "PromtEngineer--localGPT", "container_name": "PromtEngineer--localGPT", "base_port": 11350, "http_status": None, "http_success": False, "error": "Container not found - needs Dockerfile", "note": "Has docker-compose but no container running"},
+    {"repo": "TauricResearch--TradingAgents", "container_name": "TauricResearch--TradingAgents", "base_port": 11360, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "yuka-friends--Windrecorder", "container_name": "windrecorder_container", "base_port": 11480, "http_status": 200, "http_success": True, "note": "Windrecorder Streamlit"},
+    {"repo": "AuvaLab--itext2kg", "container_name": "AuvaLab--itext2kg", "base_port": 11380, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "InternLM--HuixiangDou", "container_name": "InternLM--HuixiangDou", "base_port": 11390, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "SWE-agent--SWE-agent", "container_name": "swe-agent-server", "base_port": 11400, "http_status": 404, "http_success": True, "note": "SWE-agent API (404 on root expected)"},
+    {"repo": "barun-saha--slide-deck-ai", "container_name": "slide-deck-ai", "base_port": 11410, "http_status": 200, "http_success": True, "note": "Slide Deck AI Streamlit"},
+    {"repo": "modelscope--FunClip", "container_name": "modelscope--FunClip", "base_port": 11430, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "zwq2018--Data-Copilot", "container_name": "zwq2018--Data-Copilot", "base_port": 11440, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "yihong0618--bilingual_book_maker", "container_name": "yihong0618--bilingual_book_maker", "base_port": 11450, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "NEKOparapa--AiNiee", "container_name": "NEKOparapa--AiNiee", "base_port": 11460, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "joshpxyne--gpt-migrate", "container_name": "joshpxyne--gpt-migrate", "base_port": 11470, "http_status": None, "http_success": False, "error": "Container not found", "note": "Container not running"},
+    {"repo": "yuruotong1--autoMate", "container_name": "yuruotong1--autoMate", "base_port": 11020, "http_status": None, "http_success": False, "error": "Container not found - needs Dockerfile", "note": "No Dockerfile exists"},
+    {"repo": "AbanteAI--rawdog", "container_name": "AbanteAI--rawdog", "base_port": 11050, "http_status": None, "http_success": False, "error": "Container not found - needs Dockerfile", "note": "No Dockerfile exists"},
+    {"repo": "fynnfluegge--codeqai", "container_name": "fynnfluegge--codeqai", "base_port": 11060, "http_status": None, "http_success": False, "error": "Container exited", "note": "Container exited with code 0"},
+]
+
+# Write to file
+with open("/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/verified_http_services.json", "w") as f:
+    json.dump(repos, f, indent=2)
+
+print(f"Total entries: {len(repos)}")
