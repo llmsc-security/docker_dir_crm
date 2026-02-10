@@ -1,0 +1,12 @@
+serverAddr = "143.198.205.199"
+serverPort = 80
+
+
+
+[[proxies]]
+name = "readonly"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8872
+remotePort = 9102
+
