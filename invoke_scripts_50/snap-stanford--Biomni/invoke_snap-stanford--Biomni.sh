@@ -1,15 +1,16 @@
 #!/bin/bash
 # Invoke script for snap-stanford--Biomni
-# Tests the HTTP service endpoint
-
 set -e
 
 REPO_NAME="snap-stanford--Biomni"
-PORT=11260
+DOCKER_IMAGE="snap-stanford-biomni-image"
+HOST_PORT=11260
+CONTAINER_PORT=7860
+CONTAINER_NAME="snap-stanford-biomni_container"
 HOST="localhost"
 
 echo "============================================"
-echo "Testing snap-stanford--Biomni on port $PORT"
+echo "Testing snap-stanford--Biomni on port $HOST_PORT"
 echo "============================================"
 
 # Create log directory if not exists
@@ -22,35 +23,39 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Check if container is running
-log "Checking if container is running..."
-if docker ps --format '{{.Names}}' | grep -q "${REPO_NAME}"; then
-    log "Container ${REPO_NAME} is already running"
-else
-    log "Starting container for ${REPO_NAME}..."
-    # Get container port (adjust based on port mapping)
-    CONTAINER_PORT=$((PORT - 10000))
-    docker run -d \
-        --name "${REPO_NAME}" \
-        -p ${PORT}:${CONTAINER_PORT} \
-        -e PORT=${CONTAINER_PORT} \
-        --rm \
-        "${REPO_NAME}:latest" || {
-            log "Failed to start container"
-            exit 1
-        }
-    sleep 5
-    log "Container started"
+# Build the Docker image
+log "Building Docker image..."
+cd "/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/repo_dirs/${REPO_NAME}"
+docker build -t "${DOCKER_IMAGE}" . > "${LOG_DIR}/build.log" 2>&1
+if [ $? -ne 0 ]; then
+    log "ERROR: Docker build failed"
+    exit 1
 fi
+log "Docker image built successfully"
+
+# Stop and remove existing container
+log "Cleaning up existing container..."
+docker stop "${CONTAINER_NAME}" 2>/dev/null || true
+docker rm "${CONTAINER_NAME}" 2>/dev/null || true
+
+# Run new container
+log "Starting container..."
+docker run -d \
+    --name "${CONTAINER_NAME}" \
+    -p ${HOST_PORT}:${CONTAINER_PORT} \
+    --restart unless-stopped \
+    "${DOCKER_IMAGE}"
+sleep 5
+log "Container started"
 
 # Test HTTP service
-log "Testing HTTP service on port $PORT..."
+log "Testing HTTP service on port $HOST_PORT..."
 MAX_RETRIES=10
 RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if curl -s http://$HOST:$PORT/ > /dev/null 2>&1; then
-        log "HTTP service is running on port $PORT"
-        curl -s http://$HOST:$PORT/ >> "$LOG_FILE" 2>&1
+    if curl -s http://$HOST:$HOST_PORT/ > /dev/null 2>&1; then
+        log "HTTP service is running on port $HOST_PORT"
+        curl -s http://$HOST:$HOST_PORT/ >> "$LOG_FILE" 2>&1
         log "Root endpoint test: OK"
         break
     fi
@@ -66,9 +71,9 @@ fi
 
 # Test health endpoint if available
 log "Testing health endpoint..."
-if curl -s http://$HOST:$PORT/health > /dev/null 2>&1; then
+if curl -s http://$HOST:$HOST_PORT/health > /dev/null 2>&1; then
     log "Health endpoint test: OK"
-    curl -s http://$HOST:$PORT/health >> "$LOG_FILE" 2>&1
+    curl -s http://$HOST:$HOST_PORT/health >> "$LOG_FILE" 2>&1
 else
     log "Health endpoint not available (optional)"
 fi

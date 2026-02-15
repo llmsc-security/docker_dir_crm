@@ -6,6 +6,7 @@ REPO_NAME="finaldie--auto-news"
 DOCKER_IMAGE="finaldie-auto-news_image"
 HOST_PORT=11190
 CONTAINER_PORT=8080
+CONTAINER_NAME="finaldie-auto-news_container"
 HOST="localhost"
 
 echo "============================================"
@@ -34,13 +35,13 @@ log "Docker image built successfully"
 
 # Stop and remove existing container
 log "Cleaning up existing container..."
-docker stop "${REPO_NAME}" 2>/dev/null || true
-docker rm "${REPO_NAME}" 2>/dev/null || true
+docker stop "${CONTAINER_NAME}" 2>/dev/null || true
+docker rm "${CONTAINER_NAME}" 2>/dev/null || true
 
 # Run new container
 log "Starting container..."
 docker run -d \
-    --name "${REPO_NAME}" \
+    --name "${CONTAINER_NAME}" \
     -p ${HOST_PORT}:${CONTAINER_PORT} \
     --restart unless-stopped \
     "${DOCKER_IMAGE}"

@@ -4,8 +4,9 @@
 
 set -e
 
-REPO_NAME="yuruotong1--autoMate"
+REPO_NAME="yuruotong1--automate"
 PORT=11020
+CONTAINER_PORT=7888
 HOST="localhost"
 
 echo "============================================"
@@ -28,8 +29,6 @@ if docker ps --format '{{.Names}}' | grep -q "${REPO_NAME}"; then
     log "Container ${REPO_NAME} is already running"
 else
     log "Starting container for ${REPO_NAME}..."
-    # Get container port (adjust based on port mapping)
-    CONTAINER_PORT=$((PORT - 10000))
     docker run -d \
         --name "${REPO_NAME}" \
         -p ${PORT}:${CONTAINER_PORT} \

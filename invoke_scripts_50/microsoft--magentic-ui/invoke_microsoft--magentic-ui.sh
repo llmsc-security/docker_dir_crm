@@ -16,7 +16,7 @@ BUILD_LOG="${BASE_LOG_DIR}/${REPO_NAME}.build.log"
 HOST_PORT=11240
 CONTAINER_PORT=8081
 IMAGE_NAME="microsoft--magentic-ui_image"
-CONTAINER_NAME="microsoft--magentic-ui_container"
+CONTAINER_NAME="microsoft-magentic-ui_container"
 
 # =============================================================================
 # Logging setup
@@ -82,7 +82,7 @@ docker run -d \
     --name "${CONTAINER_NAME}" \
     -p "${HOST_PORT}:${CONTAINER_PORT}" \
     --restart unless-stopped \
-    -v "${REPO_DIR}/src:/workspace/src:ro" \
+    -v "${REPO_DIR}:/workspace" \
     -e OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
     "${IMAGE_NAME}" > /dev/null 2>&1
 

@@ -5,7 +5,7 @@
 set -e
 
 REPO_NAME="reworkd--AgentGPT"
-DOCKER_IMAGE="reworkd--AgentGPT"
+DOCKER_IMAGE="reworkd--agentgpt_image"
 HOST="localhost"
 HOST_PORT=11230
 CONTAINER_PORT=3000
@@ -14,27 +14,25 @@ echo "============================================"
 echo "Testing reworkd--AgentGPT on port $HOST_PORT"
 echo "============================================"
 
-# Create log directory if not exists
+# Create log directories
 LOG_DIR="/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/invoke_scripts_50/${REPO_NAME}"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/invoke.log"
-BUILD_LOG_DIR="/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/build_logs"
-mkdir -p "$BUILD_LOG_DIR"
-BUILD_LOG="$BUILD_LOG_DIR/${REPO_NAME}.build.log"
+BUILD_LOG="/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/build_logs/reworkd--AgentGPT.build.log"
 
 # Function to log messages
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Stop and remove existing container if present
-log "Stopping existing container if present..."
-docker stop "${REPO_NAME}" 2>/dev/null || true
-docker rm "${REPO_NAME}" 2>/dev/null || true
+# Stop and remove existing container
+log "Stopping existing container..."
+docker stop "${REPO_NAME}_container" 2>/dev/null || true
+docker rm "${REPO_NAME}_container" 2>/dev/null || true
 
 # Build the Docker image
 log "Building Docker image..."
-cd "/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/repo_dirs/${REPO_NAME}/next" || exit 1
+cd "/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/repo_dirs/reworkd--AgentGPT" || exit 1
 
 docker build -t "${DOCKER_IMAGE}:latest" . >> "$BUILD_LOG" 2>&1 || {
     log "ERROR: Docker build failed"
@@ -46,8 +44,11 @@ log "Docker image built successfully"
 # Run the container
 log "Starting container for ${REPO_NAME}..."
 docker run -d \
-    --name "${REPO_NAME}" \
+    --name "${REPO_NAME}_container" \
     -p ${HOST_PORT}:${CONTAINER_PORT} \
+    -e OPENAI_API_KEY="11" \
+    -e OPENAI_API_BASE_URL="http://157.10.162.82:443/v1/" \
+    -e GPT_MODEL="gpt-5.1" \
     --rm \
     "${DOCKER_IMAGE}:latest" || {
     log "Failed to start container"
@@ -77,7 +78,7 @@ if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
     exit 1
 fi
 
-# Test health endpoint if available
+# Test health endpoint
 log "Testing health endpoint..."
 if curl -s http://$HOST:$HOST_PORT/health > /dev/null 2>&1; then
     log "Health endpoint test: OK"
@@ -89,4 +90,3 @@ fi
 log "============================================"
 log "All tests passed for ${REPO_NAME}"
 log "============================================"
-

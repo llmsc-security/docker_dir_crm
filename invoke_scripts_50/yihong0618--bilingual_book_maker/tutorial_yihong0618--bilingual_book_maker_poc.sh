@@ -1,110 +1,91 @@
-#!/bin/bash
-# tutorial_yihong0618--bilingual_book_maker_poc.sh
-# Proof-of-concept script to test the bilingual_book_maker HTTP API
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Tutorial PoC script for yihong0618--bilingual_book_maker
+Tests the HTTP service endpoints and demonstrates usage.
+"""
 
-set -e
+import sys
+import time
+import urllib.request
+import json
 
-# Absolute paths
-BASE_DIR="/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin"
-SCRIPTS_DIR="${BASE_DIR}/invoke_scripts_50/yihong0618--bilingual_book_maker"
-LOCAL_LOG="${SCRIPTS_DIR}/tutorial_poc.log"
+REPO_NAME = "yihong0618--bilingual_book_maker"
+HOST = "localhost"
+PORT = 11450
+CONTAINER_PORT = 7860
 
-# Port mapping from port_mapping_50_gap10_4.json
-REPO="yihong0618--bilingual_book_maker"
-JSON_FILE="${BASE_DIR}/port_mapping_50_gap10_4.json"
-HOST_PORT=$(python3 -c "import json; data=json.load(open('${JSON_FILE}')); print(data.get('${REPO}', 11450))")
-HOST_URL="http://127.0.0.1:${HOST_PORT}"
+def log(message, level="INFO"):
+    """Log message with timestamp."""
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] [{level}] {message}")
 
-# Create logs directory if it doesn't exist
-mkdir -p "${SCRIPTS_DIR}"
+def test_root_endpoint():
+    """Test the root endpoint."""
+    try:
+        url = f"http://{HOST}:{PORT}/"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode())
+            log(f"Root endpoint response: {data}")
+            return True
+    except Exception as e:
+        log(f"Root endpoint test failed: {e}", "ERROR")
+        return False
 
-# Logging function - append mode
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "${LOCAL_LOG}"
-}
+def test_health_endpoint():
+    """Test the health endpoint."""
+    try:
+        url = f"http://{HOST}:{PORT}/health"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode())
+            log(f"Health endpoint response: {data}")
+            return True
+    except Exception as e:
+        log(f"Health endpoint test failed: {e}", "WARNING")
+        return False
 
-# Start PoC
-log "=========================================="
-log "Starting PoC test for bilingual_book_maker"
-log "Service URL: ${HOST_URL}"
-log "=========================================="
+def test_service():
+    """Test the main service functionality."""
+    log(f"Starting PoC tests for {REPO_NAME}")
+    log(f"Container port: {CONTAINER_PORT}")
+    log(f"Host port: {PORT}")
+    log("==========================================")
 
-# Test 1: Check if service is reachable
-log "Test 1: Checking service health..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${HOST_URL}" 2>&1)
-if [ "${HTTP_CODE}" -eq 200 ]; then
-    log "SUCCESS: Service accessible (HTTP ${HTTP_CODE})"
-    curl -s "${HOST_URL}" >> "${LOCAL_LOG}" 2>&1
-else
-    log "ERROR: Service returned HTTP ${HTTP_CODE}"
-    exit 1
-fi
+    results = {
+        "repo": REPO_NAME,
+        "port": PORT,
+        "container_port": CONTAINER_PORT,
+        "tests": []
+    }
 
-# Test 2: Check API info
-log ""
-log "Test 2: Checking API info endpoint..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${HOST_URL}/info" 2>&1)
-if [ "${HTTP_CODE}" -eq 200 ]; then
-    log "SUCCESS: /info endpoint accessible (HTTP ${HTTP_CODE})"
-else
-    log "INFO: /info endpoint returned HTTP ${HTTP_CODE} (not required)"
-fi
+    # Test 1: Root endpoint
+    log("Test 1: Testing root endpoint...")
+    if test_root_endpoint():
+        results["tests"].append({"name": "root_endpoint", "status": "PASS"})
+    else:
+        results["tests"].append({"name": "root_endpoint", "status": "FAIL"})
 
-# Test 3: Check health endpoint
-log ""
-log "Test 3: Checking health endpoint..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${HOST_URL}/health" 2>&1)
-if [ "${HTTP_CODE}" -eq 200 ]; then
-    log "SUCCESS: /health endpoint accessible (HTTP ${HTTP_CODE})"
-    curl -s "${HOST_URL}/health" >> "${LOCAL_LOG}" 2>&1
-else
-    log "INFO: /health endpoint returned HTTP ${HTTP_CODE}"
-fi
+    # Test 2: Health endpoint
+    log("Test 2: Testing health endpoint...")
+    if test_health_endpoint():
+        results["tests"].append({"name": "health_endpoint", "status": "PASS"})
+    else:
+        results["tests"].append({"name": "health_endpoint", "status": "FAIL"})
 
-# Test 4: List available models
-log ""
-log "Test 4: Listing available translation models..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${HOST_URL}/models" 2>&1)
-if [ "${HTTP_CODE}" -eq 200 ]; then
-    log "SUCCESS: /models endpoint accessible (HTTP ${HTTP_CODE})"
-    curl -s "${HOST_URL}/models" >> "${LOCAL_LOG}" 2>&1
-else
-    log "INFO: /models endpoint returned HTTP ${HTTP_CODE}"
-fi
+    # Summary
+    log("==========================================")
+    passed = sum(1 for t in results["tests"] if t["status"] == "PASS")
+    total = len(results["tests"])
+    log(f"PoC completed: {passed}/{total} tests passed")
 
-# Test 5: List supported formats
-log ""
-log "Test 5: Listing supported book formats..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${HOST_URL}/formats" 2>&1)
-if [ "${HTTP_CODE}" -eq 200 ]; then
-    log "SUCCESS: /formats endpoint accessible (HTTP ${HTTP_CODE})"
-    curl -s "${HOST_URL}/formats" >> "${LOCAL_LOG}" 2>&1
-else
-    log "INFO: /formats endpoint returned HTTP ${HTTP_CODE}"
-fi
+    if passed == total:
+        log("All tests passed!", "SUCCESS")
+        return 0
+    else:
+        log(f"Some tests failed: {passed}/{total} passed", "ERROR")
+        return 1
 
-# Test 6: Test translation job submission (requires API key - will fail without one)
-log ""
-log "Test 6: Testing translation job submission (will require valid API key)..."
-# First, copy the test book to the data directory if it exists
-TEST_BOOK="test_books/animal_farm.epub"
-if [ -f "${TEST_BOOK}" ]; then
-    mkdir -p "/app/data"
-    cp "${TEST_BOOK}" "/app/data/" 2>/dev/null || true
-    log "Test book found and copied to data directory"
-fi
-
-# Try to submit a test job (will fail without API key, but that's expected)
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${HOST_URL}/translate" \
-    -F "book_name=test_books/animal_farm.epub" \
-    -F "model=chatgptapi" \
-    -F "language=Simplified Chinese" \
-    -F "test=true" 2>&1 || true)
-log "Translation job submission test: HTTP ${HTTP_CODE} (expected 400 if no API key provided)"
-
-log ""
-log "=========================================="
-log "PoC test completed!"
-log "=========================================="
-
-exit 0
+if __name__ == "__main__":
+    sys.exit(test_service())

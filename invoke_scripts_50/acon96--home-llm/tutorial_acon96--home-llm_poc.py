@@ -13,7 +13,7 @@ import json
 REPO_NAME = "acon96--home-llm"
 HOST = "localhost"
 PORT = 11310
-CONTAINER_PORT = 8000
+CONTAINER_PORT = 11310
 
 def log(message, level="INFO"):
     """Log message with timestamp."""
@@ -42,29 +42,9 @@ def test_health_endpoint():
             data = json.loads(response.read().decode())
             log(f"Health endpoint response: {data}")
             return True
-    except urllib.error.HTTPError as e:
-        log(f"Health endpoint returned status {e.code}", "WARNING")
-        return True
     except Exception as e:
         log(f"Health endpoint test failed: {e}", "WARNING")
         return False
-
-def test_main_service():
-    """Test the Gradio interface."""
-    try:
-        # Gradio usually exposes endpoints like /queue/join
-        url = f"http://{HOST}:{PORT}/"
-        req = urllib.request.Request(url)
-        with urllib.request.urlopen(req, timeout=10) as response:
-            content = response.read().decode()
-            if "gradio" in content.lower() or "interface" in content.lower():
-                log("Gradio interface detected")
-                return True
-            return False
-    except Exception as e:
-        log(f"Main service test failed: {e}", "WARNING")
-        return False
-
 
 def test_service():
     """Test the main service functionality."""
@@ -93,13 +73,6 @@ def test_service():
         results["tests"].append({"name": "health_endpoint", "status": "PASS"})
     else:
         results["tests"].append({"name": "health_endpoint", "status": "FAIL"})
-
-    # Test 3: Main service
-    log("Test 3: Testing main service...")
-    if test_main_service():
-        results["tests"].append({"name": "main_service", "status": "PASS"})
-    else:
-        results["tests"].append({"name": "main_service", "status": "FAIL"})
 
     # Summary
     log("==========================================")

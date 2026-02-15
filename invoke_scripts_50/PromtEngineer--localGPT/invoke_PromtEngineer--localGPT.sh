@@ -28,14 +28,14 @@ if docker ps --format '{{.Names}}' | grep -q "${REPO_NAME}"; then
     log "Container ${REPO_NAME} is already running"
 else
     log "Starting container for ${REPO_NAME}..."
-    # Get container port (adjust based on port mapping)
-    CONTAINER_PORT=$((PORT - 10000))
+    # Container runs on port 8000 (backend server)
+    CONTAINER_PORT=8000
+    IMAGE_NAME="promtengineer--localgpt_image"
     docker run -d \
         --name "${REPO_NAME}" \
         -p ${PORT}:${CONTAINER_PORT} \
-        -e PORT=${CONTAINER_PORT} \
         --rm \
-        "${REPO_NAME}:latest" || {
+        "${IMAGE_NAME}:latest" || {
             log "Failed to start container"
             exit 1
         }
