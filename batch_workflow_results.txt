@@ -1,0 +1,197 @@
+============================================================
+Batch Workflow Results
+Generated: Wed Feb 18 10:11:38 AM +08 2026
+============================================================
+
+============================================================
+Starting Batch Workflow
+Timestamp: Wed Feb 18 10:11:38 AM +08 2026
+============================================================
+
+============================================================
+Processing: modelscope--FunClip
+============================================================
+Service type: gradio
+Internal port: 7860
+Host port: 11430
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+============================================================
+Processing: bowang-lab--MedRAX
+============================================================
+Service type: gradio
+Internal port: 8585
+Host port: 11180
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+============================================================
+Processing: jianchang512--pyvideotrans
+============================================================
+Service type: CLI-only (no HTTP test)
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_STARTED
+
+Step 3: Skipped HTTP test (CLI tool)
+
+
+============================================================
+Completed: jianchang512--pyvideotrans
+============================================================
+
+============================================================
+Processing: AuvaLab--itext2kg
+============================================================
+Service type: gradio
+Internal port: 7860
+Host port: 11380
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+============================================================
+Processing: mrwadams--attackgen
+============================================================
+Service type: streamlit
+Internal port: 8500
+Host port: 11110
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+============================================================
+Processing: gptme--gptme
+============================================================
+Service type: fastapi
+Internal port: 11130
+Host port: 11130
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+============================================================
+Processing: joshpxyne--gpt-migrate
+============================================================
+Service type: CLI-only (no HTTP test)
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_STARTED
+
+Step 3: Skipped HTTP test (CLI tool)
+
+
+============================================================
+Completed: joshpxyne--gpt-migrate
+============================================================
+
+============================================================
+Processing: AntonOsika--gpt-engineer
+============================================================
+Service type: gradio
+Internal port: 8000
+Host port: 11330
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_STARTED
+
+Step 3: Testing HTTP endpoint...
+Status: HTTP_UP
+HTTP endpoint verified: http://localhost:11330
+
+
+============================================================
+Completed: AntonOsika--gpt-engineer
+============================================================
+
+============================================================
+Processing: NEKOparapa--AiNiee
+============================================================
+Service type: gradio
+Internal port: 8000
+Host port: 11460
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+============================================================
+Processing: langchain-ai--local-deep-researcher
+============================================================
+Service type: gradio
+Internal port: 7860
+Host port: 11030
+
+Step 1: Building Docker image...
+Status: IMAGE_BUILT
+
+Step 2: Starting container...
+Status: CONTAINER_START_FAILED
+
+
+============================================================
+SUMMARY
+============================================================
+
+Total repositories: 10
+Successfully started: 3
+Failed to start: 7
+
+HTTP Service Status:
+  - Verified UP: 1
+  - CLI-only (skipped): 2
+  - Failed/Not verified: 7
+
+Repository Details:
+-------------------
+  modelscope--FunClip                      | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+  bowang-lab--MedRAX                       | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+  jianchang512--pyvideotrans               | CONTAINER_STARTED         | SKIP_HTTP       | None
+  AuvaLab--itext2kg                        | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+  mrwadams--attackgen                      | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+  gptme--gptme                             | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+  joshpxyne--gpt-migrate                   | CONTAINER_STARTED         | SKIP_HTTP       | None
+  AntonOsika--gpt-engineer                 | CONTAINER_STARTED         | HTTP_UP         | None
+  NEKOparapa--AiNiee                       | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+  langchain-ai--local-deep-researcher      | CONTAINER_START_FAILED    | UNKNOWN         | Failed to start container
+
+Recommendations:
+----------------
+  - Review failed builds/starts above
+  - Check Docker logs: docker logs <container_name>
+  - Some HTTP services are not responding
+  - Check service logs and firewall rules
+  - All containers can be stopped with: docker stop $(docker ps -q --filter name=medrax_)
+  - All containers can be removed with: docker rm $(docker ps -aq --filter name=medrax_)
+
+Completed: Wed Feb 18 10:12:46 AM +08 2026
+============================================================
