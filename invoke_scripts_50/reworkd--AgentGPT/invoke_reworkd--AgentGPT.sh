@@ -8,7 +8,7 @@ REPO_NAME="reworkd--AgentGPT"
 DOCKER_IMAGE="reworkd--agentgpt_image"
 HOST="localhost"
 HOST_PORT=11230
-CONTAINER_PORT=3000
+CONTAINER_PORT=11230
 
 echo "============================================"
 echo "Testing reworkd--AgentGPT on port $HOST_PORT"

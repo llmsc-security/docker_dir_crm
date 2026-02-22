@@ -13,7 +13,7 @@ import json
 REPO_NAME = "reworkd--AgentGPT"
 HOST = "localhost"
 PORT = 11230
-CONTAINER_PORT = 3000
+CONTAINER_PORT = 11230
 
 def log(message, level="INFO"):
     """Log message with timestamp."""
