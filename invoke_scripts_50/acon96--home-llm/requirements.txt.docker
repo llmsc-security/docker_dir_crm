@@ -1,0 +1,23 @@
+# Home LLM Requirements
+# Core dependencies for the Home Assistant integration
+
+# LLM backends
+huggingface-hub>=0.23.0
+ollama>=0.5.1
+anthropic>=0.75.0
+
+# Data processing
+webcolors>=24.8.0
+pandas>=2.0.0
+
+# Utility libraries
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# HTTP wrapper dependencies
+fastapi>=0.111.0
+uvicorn>=0.30.0
+
+# Testing (development)
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
