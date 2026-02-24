@@ -83,3 +83,22 @@ Images have been retagged to follow the lowercase `_image` convention:
 ## Generated
 
 Date: 2026-02-24
+
+## Known Issues
+
+### Fosowl--agenticSeek Container
+
+The `Fosowl--agenticSeek` container image failed to build due to Google Chrome dependency issues:
+- Error: `google-chrome-stable` depends on `fonts-liberation` which is not installable
+- The Dockerfile attempts to install Chrome for browser automation but encounters conflicting package dependencies
+- **Status**: Container not running - requires Dockerfile fix
+
+To fix this issue, the Dockerfile at `/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/repo_dirs/Fosowl--agenticSeek/Dockerfile` needs to be updated with working Chrome installation commands.
+
+## Final Count
+
+| Category | Count |
+|----------|-------|
+| Total containers with _container suffix | 42 |
+| Containers running and responding | 41 |
+| Containers with build issues | 1 (Fosowl--agenticSeek) |
