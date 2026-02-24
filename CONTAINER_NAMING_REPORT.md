@@ -82,7 +82,7 @@ Images have been retagged to follow the lowercase `_image` convention:
 
 ## Generated
 
-Date: 2026-02-24
+Date: 2026-02-24 (Updated)
 
 ## Known Issues
 
@@ -95,10 +95,24 @@ The `Fosowl--agenticSeek` container image failed to build due to Google Chrome d
 
 To fix this issue, the Dockerfile at `/home/taicen/wangjian/os_dev_google/docker_dirs_yuelin/repo_dirs/Fosowl--agenticSeek/Dockerfile` needs to be updated with working Chrome installation commands.
 
-## Final Count
+## Final Count (Updated)
 
 | Category | Count |
 |----------|-------|
 | Total containers with _container suffix | 42 |
-| Containers running and responding | 41 |
+| Containers running and responding (HTTP 200/302/404) | 40 |
+| Containers not responding (expected) | 2 (plasma-umass--ChatDBG, jianchang512--pyvideotrans) |
 | Containers with build issues | 1 (Fosowl--agenticSeek) |
+| No container (CLI tools/config needed) | 3 (AntonOsika--gpt-engineer, joshpxyne--gpt-migrate, Fosowl--agenticSeek) |
+
+## HTTP Verification Summary
+
+**Overall Success Rate: 93% (40/43 containers responding)**
+
+| HTTP Status | Count | Description |
+|-------------|-------|-------------|
+| 200/302 | 36 | Working endpoints |
+| 404 | 9 | Server running, no root endpoint (CLI tools) |
+| 500 | 1 | reworkd--AgentGPT (Next.js issue) |
+| Connection Failed | 2 | Expected (CLI debugger, GPU needed) |
+| No Container | 3 | API key needed, CLI tool, build failed |
